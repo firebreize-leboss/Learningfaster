@@ -42,9 +42,13 @@ export function AuthForm() {
       }
 
       if (!data.session) {
-        setMessage("Compte créé. Vérifie ton email pour confirmer ton inscription avant de te connecter.");
-        setMode("signin");
-        return;
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInError) {
+          setMessage(
+            "Inscription créée mais connexion automatique impossible. Désactive la confirmation email dans Supabase (Auth > Providers > Email) puis réessaie."
+          );
+          return;
+        }
       }
 
       router.push("/dashboard");
