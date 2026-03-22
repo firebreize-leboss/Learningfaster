@@ -196,6 +196,22 @@ npm run build
 pm2 restart learningfaster
 ```
 
+### Full overwrite update (reset + pull)
+
+If you want every deploy to overwrite all local code changes and sync exactly with remote branch state:
+
+```bash
+cd /var/www/learningfaster
+./scripts/reset_pull_deploy.sh feat/test-connection
+```
+
+You can pass another branch (`main`, for example) and optionally set a custom PM2 app name:
+
+```bash
+cd /var/www/learningfaster
+APP_NAME=learningfaster ./scripts/reset_pull_deploy.sh main
+```
+
 ---
 
 ## Deployment command cheat sheet
