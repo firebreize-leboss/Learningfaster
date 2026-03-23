@@ -3,6 +3,21 @@ import type { PdfDocument } from "@/types";
 
 const PDF_BUCKET = "pdfs";
 
+function isExternalUrl(path: string) {
+  return path.startsWith("http://") || path.startsWith("https://");
+}
+
+async function getSignedUrl(filePath: string) {
+  if (isExternalUrl(filePath)) {
+    return filePath;
+  }
+
+  const supabase = await createClient();
+  const { data } = await supabase.storage.from(PDF_BUCKET).createSignedUrl(filePath, 60 * 30);
+
+  return data?.signedUrl ?? null;
+}
+
 export async function getPdfDocuments(userId: string) {
   const supabase = await createClient();
   const { data } = await supabase
@@ -11,16 +26,33 @@ export async function getPdfDocuments(userId: string) {
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
-  const documents = (data as PdfDocument[]) ?? [];
-  const withUrls = await Promise.all(
-    documents.map(async (document) => {
-      const { data: signed } = await supabase.storage.from(PDF_BUCKET).createSignedUrl(document.file_path, 3600);
-      return {
-        ...document,
-        file_url: signed?.signedUrl ?? null
-      };
-    })
-  );
+  const pdfs = (data as PdfDocument[]) ?? [];
 
-  return withUrls;
+  return Promise.all(
+    pdfs.map(async (pdf) => ({
+      ...pdf,
+      file_url: await getSignedUrl(pdf.file_path)
+    }))
+  );
+}
+
+export async function getPdfDocumentById(userId: string, pdfId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("pdf_documents")
+    .select("*")
+    .eq("id", pdfId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (!data) {
+    return null;
+  }
+
+  const document = data as PdfDocument;
+
+  return {
+    ...document,
+    file_url: await getSignedUrl(document.file_path)
+  };
 }

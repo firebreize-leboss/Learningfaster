@@ -22,13 +22,14 @@ function sanitizeFilename(filename: string) {
 export function UploadPdfForm({ userId }: UploadPdfFormProps) {
   const supabase = createClient();
   const router = useRouter();
+
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const [fileInputKey, setFileInputKey] = useState(0);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [fileInputKey, setFileInputKey] = useState(0);
 
-  const handleUpload = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage(null);
 
@@ -43,9 +44,11 @@ export function UploadPdfForm({ userId }: UploadPdfFormProps) {
     }
 
     setLoading(true);
+
     try {
       const safeName = sanitizeFilename(file.name);
       const storagePath = `${userId}/${Date.now()}-${safeName}`;
+
       const { error: uploadError } = await supabase.storage.from(PDF_BUCKET).upload(storagePath, file, {
         upsert: false,
         contentType: "application/pdf"
@@ -69,7 +72,7 @@ export function UploadPdfForm({ userId }: UploadPdfFormProps) {
 
       setTitle("");
       setFile(null);
-      setFileInputKey((previous) => previous + 1);
+      setFileInputKey((prev) => prev + 1);
       setMessage("PDF uploadé avec succès.");
       router.refresh();
     } catch {
@@ -80,19 +83,19 @@ export function UploadPdfForm({ userId }: UploadPdfFormProps) {
   };
 
   return (
-    <form className="space-y-3" onSubmit={handleUpload}>
+    <form className="space-y-3" onSubmit={handleSubmit}>
       <Input
         type="text"
-        placeholder="Titre du PDF (optionnel)"
         value={title}
         onChange={(event) => setTitle(event.target.value)}
+        placeholder="Titre du PDF (optionnel)"
       />
       <Input
         key={fileInputKey}
         type="file"
         accept="application/pdf"
-        onChange={(event) => setFile(event.target.files?.[0] ?? null)}
         required
+        onChange={(event) => setFile(event.target.files?.[0] ?? null)}
       />
       <Button type="submit" disabled={loading}>
         {loading ? "Upload en cours..." : "Uploader le PDF"}

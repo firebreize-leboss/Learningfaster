@@ -42,6 +42,7 @@ lib/
   supabase/
 supabase/
   migrations/001_init.sql
+  migrations/002_pdf_storage.sql
 types/
 ```
 
@@ -69,7 +70,9 @@ Key principles:
 
 ### 3) PDF Library
 - Page: `/pdf-library`
-- Displays user-owned PDF history with title, upload date, and file URL.
+- Upload form with storage per user folder (`userId/...`).
+- List of uploaded PDFs with link to a dedicated in-app reader page.
+- Dedicated reader page displays the PDF and 2 placeholder summary blocks.
 
 ### 4) Learning modes (MVP stubs)
 - `/exercises/course`: form + mock exercises by chapter
@@ -86,11 +89,15 @@ Key principles:
 2. Copy `.env.example` to `.env.local` and fill variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-3. Run SQL from:
-   - `supabase/migrations/001_init.sql`
-   - `supabase/migrations/002_pdf_storage.sql` (creates `pdfs` bucket + per-user folder policies)
-4. In Supabase Auth settings, enable Email provider and disable **Confirm email** so users are signed in right after sign up.
-5. (Optional now, needed soon) create a storage bucket for PDF files.
+<<<<<<< HEAD
+3. Run SQL from `supabase/migrations/001_init.sql` in Supabase SQL editor.
+4. Run SQL from `supabase/migrations/002_pdf_storage.sql` in Supabase SQL editor (creates `pdfs` bucket + policies).
+5. In Supabase Auth settings, enable Email provider and disable **Confirm email** so users are signed in right after sign up.
+=======
+3. Run SQL from `supabase/migrations/001_init.sql` in Supabase SQL editor.
+4. Run SQL from `supabase/migrations/002_pdf_storage.sql` in Supabase SQL editor (creates `pdfs` bucket + policies).
+5. In Supabase Auth settings, enable Email provider and disable **Confirm email** so users are signed in right after sign up.
+>>>>>>> c0b63af (feat: add in-app pdf reader page with summary placeholders)
 
 ## Database schema (MVP)
 

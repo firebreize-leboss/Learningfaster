@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { getPdfDocuments } from "@/features/pdf-library/service";
@@ -29,13 +30,9 @@ export default async function PdfLibraryPage() {
             <Card key={doc.id}>
               <p className="font-semibold">{doc.title}</p>
               <p className="text-sm text-slate-600">Uploaded: {new Date(doc.created_at).toLocaleString()}</p>
-              {doc.file_url ? (
-                <a href={doc.file_url} className="text-sm text-brand-700 underline" target="_blank" rel="noreferrer">
-                  Open file
-                </a>
-              ) : (
-                <p className="text-sm text-slate-500">Lien temporaire indisponible</p>
-              )}
+              <Link href={`/pdf-library/${doc.id}`} className="text-sm text-brand-700 underline">
+                Ouvrir dans le lecteur
+              </Link>
             </Card>
           ))
         ) : (
