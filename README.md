@@ -1,33 +1,34 @@
-# LearningFaster MVP (Math)
+# LearningFaster (MVP)
 
-LearningFaster is a production-oriented MVP for math learning with three core modes:
+LearningFaster is a math-first learning web app MVP with three modes:
 - Exercises by course/chapter
-- Exercises by difficulty (1 to 5)
-- Summary sheet generation
+- Exercises by level (1-5)
+- Summary sheets
 
-This repository is structured to ship fast while remaining scalable.
+This repository provides a production-minded foundation with authentication, protected routes, dashboard metrics, PDF history/library and Supabase-ready backend integration.
 
 ## Chosen stack
-- **Next.js 14 (App Router)**: Full-stack React framework with server rendering and route protection.
-- **TypeScript**: Type safety across UI, services, and models.
-- **Tailwind CSS**: Fast and consistent UI composition.
-- **Supabase**: Email/password auth, PostgreSQL database, and storage-ready architecture.
+
+- **Next.js 14 (App Router)** + **TypeScript**
+- **Tailwind CSS** for fast, consistent UI
+- **Supabase** for Auth + PostgreSQL + Storage
 
 Why this stack:
-- Fast MVP velocity
-- Good production defaults
-- Clear path for future AI/PDF processing features
-- Easy deploy workflow on a Linux VPS
+- Ships fast for MVP
+- Cleanly scalable for feature growth
+- Straightforward VPS deployment (Node + PM2 + Nginx)
 
-## Architecture overview
+## Project architecture
 
-```txt
+```text
 app/
   (auth)/auth/page.tsx
   (dashboard)/
     dashboard/page.tsx
     pdf-library/page.tsx
+    pdf-library/[pdfId]/page.tsx
     exercises/course/page.tsx
+    exercises/course/workspace/[pdfId]/page.tsx
     exercises/level/page.tsx
     summaries/page.tsx
 components/
@@ -43,6 +44,10 @@ lib/
 supabase/
   migrations/001_init.sql
   migrations/002_pdf_storage.sql
+<<<<<<< HEAD
+=======
+  migrations/003_pdf_chapter.sql
+>>>>>>> 74aaef5 (feat: improve dashboard and chapter-aware course workflows)
 types/
 ```
 
@@ -64,20 +69,25 @@ Key principles:
 - Landing page after login: `/dashboard`.
 - Counters:
   - exercises generated
-  - exercises completed
-- Recent PDFs widget
+  - courses transformed into sheets
+- Recent PDFs widget with direct button to open viewer page
 - Quick links to all learning modes
 
 ### 3) PDF Library
 - Page: `/pdf-library`
 - Upload form with storage per user folder (`userId/...`).
+<<<<<<< HEAD
+=======
+- Chapter-aware uploads with chapter suggestions reused in course/summaries workflows.
+>>>>>>> 74aaef5 (feat: improve dashboard and chapter-aware course workflows)
 - List of uploaded PDFs with link to a dedicated in-app reader page.
 - Dedicated reader page displays the PDF and 2 placeholder summary blocks.
 
 ### 4) Learning modes (MVP stubs)
-- `/exercises/course`: form + mock exercises by chapter
+- `/exercises/course`: choose existing PDF or upload, target chapter, then open workspace.
+- `/exercises/course/workspace/[pdfId]`: PDF visualization + placeholder for generated exercises.
 - `/exercises/level`: level selector (1-5) + mock exercises
-- `/summaries`: topic input + mock summary sheet
+- `/summaries`: topic input + chapter-aware PDF attachment/upload + mock summary sheet
 
 ### 5) Exercise tracking model
 - `exercise_sessions` table designed for generated/completed states.
@@ -91,7 +101,12 @@ Key principles:
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 3. Run SQL from `supabase/migrations/001_init.sql` in Supabase SQL editor.
 4. Run SQL from `supabase/migrations/002_pdf_storage.sql` in Supabase SQL editor (creates `pdfs` bucket + policies).
+<<<<<<< HEAD
 5. In Supabase Auth settings, enable Email provider and disable **Confirm email** so users are signed in right after sign up.
+=======
+5. Run SQL from `supabase/migrations/003_pdf_chapter.sql` in Supabase SQL editor (adds chapter metadata on uploaded PDFs).
+6. In Supabase Auth settings, enable Email provider and disable **Confirm email** so users are signed in right after sign up.
+>>>>>>> 74aaef5 (feat: improve dashboard and chapter-aware course workflows)
 
 ## Database schema (MVP)
 
@@ -123,12 +138,21 @@ npm run build
 npm run start
 ```
 
-## GitHub workflow
+## Environment variables
+
+Create `.env.local`:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
+
+## Git workflow
 
 ```bash
 git init
 git add .
-git commit -m "feat: initialize LearningFaster MVP"
+git commit -m "feat: initialize learningfaster mvp"
 git branch -M main
 git remote add origin <YOUR_GITHUB_REPO_URL>
 git push -u origin main
@@ -136,14 +160,14 @@ git push -u origin main
 
 ## VPS deployment (Node + PM2 + Nginx)
 
-### 1) Clone and configure
+### 1) Clone and install
 
 ```bash
 cd /var/www
 git clone <YOUR_GITHUB_REPO_URL> learningfaster
 cd learningfaster
 cp .env.example .env.local
-# fill .env.local with production values
+# fill env vars
 npm install
 npm run build
 ```
@@ -154,25 +178,23 @@ npm run build
 npm install -g pm2
 pm2 start npm --name learningfaster -- start
 pm2 save
-pm2 startup
+pm2 status
 ```
 
-By default Next.js runs on port 3000.
+### 3) Nginx reverse proxy (HTTP)
 
-### 3) Nginx reverse proxy example
-
-`/etc/nginx/sites-available/learningfaster`
+Create `/etc/nginx/sites-available/learningfaster`:
 
 ```nginx
 server {
   listen 80;
-  server_name your-domain.com;
+  server_name YOUR_DOMAIN;
 
   location / {
     proxy_pass http://127.0.0.1:3000;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection 'upgrade';
+    proxy_set_header Connection "upgrade";
     proxy_set_header Host $host;
     proxy_cache_bypass $http_upgrade;
   }
@@ -182,44 +204,56 @@ server {
 Enable and reload:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/learningfaster /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/learningfaster /etc/nginx/sites-enabled/learningfaster
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-(Then add HTTPS with Certbot.)
-
-## Update after future pushes
+### 4) HTTPS (recommended)
 
 ```bash
-cd /var/www/learningfaster
+sudo apt update
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d YOUR_DOMAIN
+```
+
+## Update process after future pushes
+
+From VPS app directory:
+
+```bash
 git pull origin main
 npm install
 npm run build
 pm2 restart learningfaster
 ```
 
-### Full overwrite update (reset + pull)
-
-If you want every deploy to overwrite all local code changes and sync exactly with remote branch state:
+For a hard reset to remote state (overwrites local code):
 
 ```bash
-cd /var/www/learningfaster
-./scripts/reset_pull_deploy.sh feat/test-connection
+git fetch origin
+git reset --hard origin/main
+git clean -fd
+npm install
+npm run build
+pm2 restart learningfaster
 ```
 
-You can pass another branch (`main`, for example) and optionally set a custom PM2 app name:
+## Optional helper script
+
+A helper is included at `scripts/reset_pull_deploy.sh`.
+
+Usage:
 
 ```bash
-cd /var/www/learningfaster
-APP_NAME=learningfaster ./scripts/reset_pull_deploy.sh main
+./scripts/reset_pull_deploy.sh main
+# or
+APP_NAME=learningfaster ./scripts/reset_pull_deploy.sh feat/test-connection
 ```
-
----
 
 ## Deployment command cheat sheet
 
-### Local quick start
+### Local dev
 
 ```bash
 npm install
@@ -227,12 +261,12 @@ cp .env.example .env.local
 npm run dev
 ```
 
-### GitHub push (new repo)
+### Git init / first push
 
 ```bash
 git init
 git add .
-git commit -m "feat: initialize LearningFaster MVP"
+git commit -m "feat: initialize learningfaster mvp"
 git branch -M main
 git remote add origin <YOUR_GITHUB_REPO_URL>
 git push -u origin main

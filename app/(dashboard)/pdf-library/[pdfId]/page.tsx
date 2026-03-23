@@ -32,6 +32,7 @@ export default async function PdfViewerPage({ params }: PdfViewerPageProps) {
         </Link>
         <h2 className="text-2xl font-bold">{pdf.title}</h2>
         <p className="text-sm text-slate-500">Uploadé le {new Date(pdf.created_at).toLocaleString()}</p>
+        {pdf.chapter ? <p className="text-xs font-medium text-brand-700">Chapitre: {pdf.chapter}</p> : null}
       </header>
 
       <Card className="space-y-4">

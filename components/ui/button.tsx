@@ -8,9 +8,9 @@ export function Button({ variant = "primary", className, ...props }: ButtonProps
   return (
     <button
       className={clsx(
-        "inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium",
+        "inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition duration-150 disabled:cursor-not-allowed disabled:opacity-60",
         {
-          "bg-brand-500 text-white hover:bg-brand-700": variant === "primary",
+          "bg-brand-500 text-white hover:-translate-y-0.5 hover:bg-brand-700": variant === "primary",
           "bg-slate-200 text-slate-900 hover:bg-slate-300": variant === "secondary",
           "text-slate-700 hover:bg-slate-100": variant === "ghost"
         },

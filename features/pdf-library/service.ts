@@ -56,3 +56,25 @@ export async function getPdfDocumentById(userId: string, pdfId: string) {
     file_url: await getSignedUrl(document.file_path)
   };
 }
+
+export async function getUserChapterSuggestions(userId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("pdf_documents")
+    .select("chapter")
+    .eq("user_id", userId)
+    .not("chapter", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  const unique = new Set<string>();
+
+  for (const item of data ?? []) {
+    const chapter = (item.chapter as string | null)?.trim();
+    if (chapter) {
+      unique.add(chapter);
+    }
+  }
+
+  return Array.from(unique);
+}

@@ -12,6 +12,7 @@ export interface PdfDocument {
   title: string;
   file_path: string;
   file_url?: string | null;
+  chapter?: string | null;
   created_at: string;
 }
 
