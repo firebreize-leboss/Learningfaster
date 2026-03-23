@@ -1,10 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { CREDIT_COSTS } from "@/lib/credits";
 import { createClient } from "@/lib/supabase/client";
 import { generateMockSummary } from "@/features/summaries/mock";
 import type { PdfDocument } from "@/types";
@@ -25,6 +27,7 @@ function sanitizeFilename(filename: string) {
 }
 
 export function SummaryForm({ userId, pdfs, chapterSuggestions }: SummaryFormProps) {
+  const router = useRouter();
   const supabase = createClient();
   const [topic, setTopic] = useState("");
   const [chapter, setChapter] = useState("");
@@ -44,7 +47,7 @@ export function SummaryForm({ userId, pdfs, chapterSuggestions }: SummaryFormPro
     setLoading(true);
 
     try {
-      let attachedPdfId = selectedPdfId;
+      let attachedPdfId = selectedPdfId || null;
 
       if (source === "upload") {
         if (!newPdfFile) {
@@ -84,17 +87,27 @@ export function SummaryForm({ userId, pdfs, chapterSuggestions }: SummaryFormPro
         attachedPdfId = insertedPdf.id;
       }
 
+      const { error: creditError } = await supabase.rpc("consume_credits", {
+        p_user_id: userId,
+        p_cost: CREDIT_COSTS.summarySheet
+      });
+
+      if (creditError) {
+        setMessage("Crédits insuffisants pour générer cette fiche.");
+        return;
+      }
+
       const generated = generateMockSummary(cleanTopic);
       setSummary(generated);
 
       const title = chapter.trim() ? `Fiche ${chapter.trim()}` : `Fiche ${cleanTopic}`;
-      const content = attachedPdfId ? `${generated}\n\nPDF lié: ${attachedPdfId}` : generated;
-
       const { error } = await supabase.from("summary_sheets").insert({
         user_id: userId,
         title,
         topic: cleanTopic,
-        content
+        chapter: chapter.trim() || null,
+        pdf_document_id: attachedPdfId,
+        content: generated
       });
 
       if (error) {
@@ -103,6 +116,7 @@ export function SummaryForm({ userId, pdfs, chapterSuggestions }: SummaryFormPro
       }
 
       setMessage("Fiche générée (mode mock) et sauvegardée.");
+      router.refresh();
     } finally {
       setLoading(false);
     }
@@ -112,6 +126,7 @@ export function SummaryForm({ userId, pdfs, chapterSuggestions }: SummaryFormPro
     <section className="space-y-4">
       <Card className="space-y-3">
         <h3 className="text-lg font-semibold">Generate summary sheet</h3>
+        <p className="text-sm text-slate-600">Cette génération coûte {CREDIT_COSTS.summarySheet} crédit.</p>
 
         <Select value={source} onChange={(event) => setSource(event.target.value as "existing" | "upload")}> 
           {pdfs.length ? <option value="existing">Utiliser un PDF déjà importé</option> : null}

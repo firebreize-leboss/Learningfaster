@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { getPdfDocuments, getUserChapterSuggestions } from "@/features/pdf-library/service";
 import { UploadPdfForm } from "@/features/pdf-library/upload-form";
+import { PdfItemActions } from "@/features/pdf-library/pdf-item-actions";
 
 export default async function PdfLibraryPage() {
   const supabase = await createClient();
@@ -31,9 +31,7 @@ export default async function PdfLibraryPage() {
               <p className="font-semibold">{doc.title}</p>
               {doc.chapter ? <p className="text-xs font-medium text-brand-700">Chapitre: {doc.chapter}</p> : null}
               <p className="text-sm text-slate-600">Uploaded: {new Date(doc.created_at).toLocaleString()}</p>
-              <Link href={`/pdf-library/${doc.id}`} className="text-sm text-brand-700 underline">
-                Ouvrir dans le lecteur
-              </Link>
+              <PdfItemActions pdfId={doc.id} filePath={doc.file_path} />
             </Card>
           ))
         ) : (

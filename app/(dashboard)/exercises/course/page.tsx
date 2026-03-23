@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { getPdfDocuments, getUserChapterSuggestions } from "@/features/pdf-library/service";
+import { getCourseExerciseHistory } from "@/features/exercises/service";
 import { CourseExerciseForm } from "@/features/exercises/course-form";
+import { getPdfDocuments, getUserChapterSuggestions } from "@/features/pdf-library/service";
 
 export default async function ExercisesByCoursePage() {
   const supabase = await createClient();
@@ -10,7 +11,11 @@ export default async function ExercisesByCoursePage() {
 
   if (!user) return null;
 
-  const [pdfs, chapterSuggestions] = await Promise.all([getPdfDocuments(user.id), getUserChapterSuggestions(user.id)]);
+  const [pdfs, chapterSuggestions, history] = await Promise.all([
+    getPdfDocuments(user.id),
+    getUserChapterSuggestions(user.id),
+    getCourseExerciseHistory(user.id)
+  ]);
 
   return (
     <section className="space-y-4">
@@ -20,7 +25,7 @@ export default async function ExercisesByCoursePage() {
           Sélectionne un PDF existant ou upload un nouveau cours, ajoute un chapitre puis génère un espace de travail.
         </p>
       </header>
-      <CourseExerciseForm userId={user.id} pdfs={pdfs} chapterSuggestions={chapterSuggestions} />
+      <CourseExerciseForm userId={user.id} pdfs={pdfs} chapterSuggestions={chapterSuggestions} history={history} />
     </section>
   );
 }

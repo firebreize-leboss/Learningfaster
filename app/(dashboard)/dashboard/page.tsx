@@ -20,7 +20,7 @@ export default async function DashboardPage() {
         <p className="text-slate-600">Track your progress and jump into your learning modes.</p>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <Card className="border-brand-100">
           <p className="text-sm text-slate-500">Nombre d&apos;exercices générés</p>
           <p className="text-3xl font-bold text-brand-700">{data.totalGenerated}</p>
@@ -28,6 +28,10 @@ export default async function DashboardPage() {
         <Card className="border-brand-100">
           <p className="text-sm text-slate-500">Nombre de cours transformés en fiche</p>
           <p className="text-3xl font-bold text-brand-700">{data.totalSheets}</p>
+        </Card>
+        <Card className="border-brand-100">
+          <p className="text-sm text-slate-500">Crédits disponibles</p>
+          <p className="text-3xl font-bold text-brand-700">{data.credits}</p>
         </Card>
       </div>
 

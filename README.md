@@ -28,7 +28,7 @@ app/
     pdf-library/page.tsx
     pdf-library/[pdfId]/page.tsx
     exercises/course/page.tsx
-    exercises/course/workspace/[pdfId]/page.tsx
+    exercises/course/workspace/[sessionId]/page.tsx
     exercises/level/page.tsx
     summaries/page.tsx
 components/
@@ -45,6 +45,7 @@ supabase/
   migrations/001_init.sql
   migrations/002_pdf_storage.sql
   migrations/003_pdf_chapter.sql
+  migrations/004_generations_and_credits.sql
 types/
 ```
 
@@ -79,13 +80,13 @@ Key principles:
 
 ### 4) Learning modes (MVP stubs)
 - `/exercises/course`: choose existing PDF or upload, target chapter, then open workspace.
-- `/exercises/course/workspace/[pdfId]`: PDF visualization + placeholder for generated exercises.
+- `/exercises/course/workspace/[sessionId]`: PDF visualization + generated exercises memory.
 - `/exercises/level`: level selector (1-5) + mock exercises
-- `/summaries`: topic input + chapter-aware PDF attachment/upload + mock summary sheet
+- `/summaries`: topic input + chapter-aware PDF attachment/upload + persisted summary history
 
 ### 5) Exercise tracking model
 - `exercise_sessions` table designed for generated/completed states.
-- Dashboard aggregates counters from these records.
+- Dashboard aggregates counters from these records and exposes simulated credits.
 
 ## Supabase setup
 
@@ -96,7 +97,8 @@ Key principles:
 3. Run SQL from `supabase/migrations/001_init.sql` in Supabase SQL editor.
 4. Run SQL from `supabase/migrations/002_pdf_storage.sql` in Supabase SQL editor (creates `pdfs` bucket + policies).
 5. Run SQL from `supabase/migrations/003_pdf_chapter.sql` in Supabase SQL editor (adds chapter metadata on uploaded PDFs).
-6. In Supabase Auth settings, enable Email provider and disable **Confirm email** so users are signed in right after sign up.
+6. Run SQL from `supabase/migrations/004_generations_and_credits.sql` in Supabase SQL editor (credits + generation memory fields).
+7. In Supabase Auth settings, enable Email provider and disable **Confirm email** so users are signed in right after sign up.
 
 ## Database schema (MVP)
 
