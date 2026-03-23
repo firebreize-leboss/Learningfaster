@@ -11,6 +11,7 @@ export interface PdfDocument {
   user_id: string;
   title: string;
   file_path: string;
+  file_url?: string | null;
   created_at: string;
 }
 

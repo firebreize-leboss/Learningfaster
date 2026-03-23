@@ -86,7 +86,9 @@ Key principles:
 2. Copy `.env.example` to `.env.local` and fill variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-3. Run SQL from `supabase/migrations/001_init.sql` in Supabase SQL editor.
+3. Run SQL from:
+   - `supabase/migrations/001_init.sql`
+   - `supabase/migrations/002_pdf_storage.sql` (creates `pdfs` bucket + per-user folder policies)
 4. In Supabase Auth settings, enable Email provider and disable **Confirm email** so users are signed in right after sign up.
 5. (Optional now, needed soon) create a storage bucket for PDF files.
 
