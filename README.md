@@ -44,10 +44,7 @@ lib/
 supabase/
   migrations/001_init.sql
   migrations/002_pdf_storage.sql
-<<<<<<< HEAD
-=======
   migrations/003_pdf_chapter.sql
->>>>>>> 74aaef5 (feat: improve dashboard and chapter-aware course workflows)
 types/
 ```
 
@@ -76,10 +73,7 @@ Key principles:
 ### 3) PDF Library
 - Page: `/pdf-library`
 - Upload form with storage per user folder (`userId/...`).
-<<<<<<< HEAD
-=======
 - Chapter-aware uploads with chapter suggestions reused in course/summaries workflows.
->>>>>>> 74aaef5 (feat: improve dashboard and chapter-aware course workflows)
 - List of uploaded PDFs with link to a dedicated in-app reader page.
 - Dedicated reader page displays the PDF and 2 placeholder summary blocks.
 
@@ -101,12 +95,8 @@ Key principles:
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 3. Run SQL from `supabase/migrations/001_init.sql` in Supabase SQL editor.
 4. Run SQL from `supabase/migrations/002_pdf_storage.sql` in Supabase SQL editor (creates `pdfs` bucket + policies).
-<<<<<<< HEAD
-5. In Supabase Auth settings, enable Email provider and disable **Confirm email** so users are signed in right after sign up.
-=======
 5. Run SQL from `supabase/migrations/003_pdf_chapter.sql` in Supabase SQL editor (adds chapter metadata on uploaded PDFs).
 6. In Supabase Auth settings, enable Email provider and disable **Confirm email** so users are signed in right after sign up.
->>>>>>> 74aaef5 (feat: improve dashboard and chapter-aware course workflows)
 
 ## Database schema (MVP)
 
