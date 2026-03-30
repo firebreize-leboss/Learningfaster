@@ -46,6 +46,7 @@ supabase/
   migrations/002_pdf_storage.sql
   migrations/003_pdf_chapter.sql
   migrations/004_generations_and_credits.sql
+  migrations/005_seed_alexer_credits.sql
 types/
 ```
 
@@ -68,13 +69,14 @@ Key principles:
 - Counters:
   - exercises generated
   - courses transformed into sheets
-- Recent PDFs widget with direct button to open viewer page
+- Section séparée: derniers PDFs + dernières générations (type + chapitre)
 - Quick links to all learning modes
 
 ### 3) PDF Library
 - Page: `/pdf-library`
 - Upload form with storage per user folder (`userId/...`).
 - Chapter-aware uploads with chapter suggestions reused in course/summaries workflows.
+- Dossiers visuels de générations classés par chapitre, avec filtres date/type.
 - List of uploaded PDFs with link to a dedicated in-app reader page.
 - Dedicated reader page displays the PDF and 2 placeholder summary blocks.
 
@@ -98,7 +100,8 @@ Key principles:
 4. Run SQL from `supabase/migrations/002_pdf_storage.sql` in Supabase SQL editor (creates `pdfs` bucket + policies).
 5. Run SQL from `supabase/migrations/003_pdf_chapter.sql` in Supabase SQL editor (adds chapter metadata on uploaded PDFs).
 6. Run SQL from `supabase/migrations/004_generations_and_credits.sql` in Supabase SQL editor (credits + generation memory fields).
-7. In Supabase Auth settings, enable Email provider and disable **Confirm email** so users are signed in right after sign up.
+7. Run SQL from `supabase/migrations/005_seed_alexer_credits.sql` to set `alxerpaypal@gmail.com` to 1000 credits.
+8. In Supabase Auth settings, enable Email provider and disable **Confirm email** so users are signed in right after sign up.
 
 ## Database schema (MVP)
 
